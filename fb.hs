@@ -4,6 +4,6 @@ fb n | n `rem` 15 == 0 = "FizzBuzz"
      | n `rem` 3  == 0 = "Fizz"
      | otherwise       = show n
 
-fibs = [ fb x | x <- [1..]]
+fzbz = [ fb x | x <- [1..]]
 
-main = putStrLn . concat $ map (++ " ") $ take 100 fibs
+main = putStrLn . concat $ map (++ " ") $ take 100 fzbz
