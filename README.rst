@@ -13,6 +13,8 @@ To Do
 
 - [X] Hello, World!
 - [X] FizzBuzz
+- [-] Happy Sequence tester
+- [ ] Collatz Conjecture tester
 - [ ] Fibonacci Generator
 - [ ] ``hr`` implementation
 - [ ] Basic ``echo`` or ``cat``
