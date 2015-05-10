@@ -16,6 +16,7 @@ unhappy n = not $ happy n
 {--
  - TODO:
  --
+ - offer some predicate functions for happy primes
  - main should loop on reading lines from the user to test happiness
  --}
 main = putStrLn . show $ happy 31413

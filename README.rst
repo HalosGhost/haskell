@@ -13,9 +13,9 @@ To Do
 
 - [X] Hello, World!
 - [X] FizzBuzz
-- [-] Happy Sequence tester
+- [-] Happy Sequence / Happy Primes tester
 - [ ] Collatz Conjecture tester
-- [ ] Fibonacci Generator
+- [ ] Fibonacci Generator (Fast fibs algorithm)
 - [ ] ``hr`` implementation
 - [ ] Basic ``echo`` or ``cat``
 - [ ] Something with ncurses
