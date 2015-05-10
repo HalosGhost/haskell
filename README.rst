@@ -13,7 +13,7 @@ To Do
 
 - [X] Hello, World!
 - [X] FizzBuzz
-- [-] Happy Sequence / Happy Primes tester
+- [-] Happy Sequence / Happy tester
 - [ ] Collatz Conjecture tester
 - [ ] Fibonacci Generator (Fast fibs algorithm)
 - [ ] ``hr`` implementation
