@@ -1,19 +1,18 @@
 import Data.Char
 
-happy :: Int -> Int
-happy = sum . map (^2) . map Data.Char.digitToInt . show
+nextHappy :: Int -> Int
+nextHappy = sum . map (^2) . map Data.Char.digitToInt . show
+
+happySeq :: Int -> [Int]
+happySeq n = next : (takeWhile (/= next) . happySeq $ next)
+         where next = nextHappy n
+
+happy :: Int -> Bool
+happy n = last (happySeq n) == 1
 
 {--
  - TODO:
  --
- - unhappy sequences should terminate on the first repetition
+ - main should loop on reading lines from the user to test happiness
  --}
-
-happies :: Int -> [Int]
-happies 1 = []
-happies n = happy n : happies (happy n)
-
-isHappy :: Int -> Bool
-isHappy n = last (happies n) == 1
-
-main = putStrLn . show $ happies 31413
+main = putStrLn . show $ happy 31413
