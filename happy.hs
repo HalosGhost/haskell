@@ -1,4 +1,6 @@
 import Data.Char
+import System.Environment
+import System.Exit
 
 nextHappy :: Int -> Int
 nextHappy = sum . map (^2) . map Data.Char.digitToInt . show
@@ -16,6 +18,16 @@ unhappy n = not $ happy n
 {--
  - TODO:
  --
- - main should loop on reading lines from the user to test happiness
+ - main should either loop on user input from stdin or parse cli args
+ - cf. https://wiki.haskell.org/Tutorials/Programming_Haskell/Argument_handling#Getting_in_arguments
  --}
-main = putStrLn . show $ happy 31413
+main = getArgs >>= parse >>= putStr
+
+parse ["-h"] = usage >> exitSucc
+parse ["-v"] = ver   >> exitSucc
+parse []     = usage >> exitFail
+
+usage    = putStrLn "Usage: happy [-vh] [FILE ..]"
+ver      = putStrLn "happy 0.0.1"
+exitSucc = exitWith ExitSuccess
+exitFail = exitWith $ ExitFailure 1
