@@ -13,9 +13,6 @@ happySeq n = next : (takeWhile (/= next) . happySeq $ next)
 happy :: Int -> Bool
 happy n = last (happySeq n) == 1
 
-unhappy :: Int -> Bool
-unhappy n = not $ happy n
-
 main :: IO ()
 main = getArgs >>= parse >>= putStrLn
 
