@@ -17,7 +17,8 @@ To Do
 - [X] Hello, World!
 - [X] FizzBuzz
 - [X] Happy Sequence / Happy tester (still to be cleaned up and purified)
-- [ ] Collatz Conjecture tester
+- [-] Collatz Conjecture tester (still to be cleaned up and purified)
+- [ ] Add ``-s`` options to happy and collatz to print the sequence for a given input
 - [ ] Fibonacci Generator (Fast fibs algorithm)
 - [ ] ``hr`` implementation
 - [ ] Basic ``echo`` or ``cat``

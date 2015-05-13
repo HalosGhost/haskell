@@ -3,15 +3,17 @@ import qualified Data.List as List
 import System.Environment
 import System.Exit
 
-nextHappy :: Int -> Int
-nextHappy = sum . map (^2) . map Char.digitToInt . show
+nextCollatz :: Int -> Int
+nextCollatz n | even n    = n `div` 2
+              | otherwise = 3 * n + 1
 
-happySeq :: Int -> [Int]
-happySeq n = next : (takeWhile (/= next) . happySeq $ next)
-           where next = nextHappy n
+collatzSeq :: Int -> [Int]
+collatzSeq 1 = []
+collatzSeq n = next : (collatzSeq next)
+             where next = nextCollatz n
 
-happy :: Int -> Bool
-happy n = last (happySeq n) == 1
+collatz :: Int -> Bool
+collatz n = last (collatzSeq n) == 1
 
 main :: IO ()
 main = getArgs >>= parse >>= putStrLn
@@ -22,10 +24,10 @@ parse a | elem "-h" a || elem "--help"    a = usage >> exitSucc
         | a == []     || elem "-"         a = stdin
         | otherwise                         = args a
         where
-           args  = return . List.intercalate " " . map (show . happy . read)
+           args  = return . List.intercalate " " . map (show . collatz . read)
            stdin = getContents >>= (return . lines) >>= args
 
-usage    = putStrLn "Usage: happy [-vh] [[NUM ..]|-]"
-ver      = putStrLn "happy 0.0.1"
+usage    = putStrLn "Usage: collatz [-vh] [[NUM ..]|-]"
+ver      = putStrLn "collatz 0.0.1"
 exitSucc = exitWith ExitSuccess
 exitFail = exitWith $ ExitFailure 1
