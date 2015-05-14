@@ -15,6 +15,9 @@ collatzSeq n = next : (collatzSeq next)
 collatz :: Int -> Bool
 collatz n = last (collatzSeq n) == 1
 
+collatzConject :: Int -> String
+collatzConject n = show $ collatz n
+
 main :: IO ()
 main = getArgs >>= parse >>= putStrLn
 
@@ -24,10 +27,10 @@ parse a | elem "-h" a || elem "--help"    a = usage >> exitSucc
         | a == []     || elem "-"         a = stdin
         | otherwise                         = args a
         where
-           args  = return . List.intercalate " " . map (show . collatz . read)
+           args  = return . List.intercalate " " . map (collatzConject . read)
            stdin = getContents >>= (return . lines) >>= args
 
-usage    = putStrLn "Usage: collatz [-vh] [[NUM ..]|-]"
-ver      = putStrLn "collatz 0.0.1"
+usage    = putStrLn "Usage: collatz [[[-h|--help]|[-v|--version]]|[[NUM ..]|-]]"
+ver      = putStrLn "collatz 0.0.2"
 exitSucc = exitWith ExitSuccess
 exitFail = exitWith $ ExitFailure 1
