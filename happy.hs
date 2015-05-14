@@ -13,6 +13,10 @@ happySeq n = next : (takeWhile (/= next) . happySeq $ next)
 happy :: Int -> Bool
 happy n = last (happySeq n) == 1
 
+happiness :: Int -> String
+happiness n | happy n   = "Happy"
+            | otherwise = "Unhappy"
+
 main :: IO ()
 main = getArgs >>= parse >>= putStrLn
 
@@ -22,10 +26,10 @@ parse a | elem "-h" a || elem "--help"    a = usage >> exitSucc
         | a == []     || elem "-"         a = stdin
         | otherwise                         = args a
         where
-           args  = return . List.intercalate " " . map (show . happy . read)
+           args  = return . List.intercalate " " . map (happiness . read)
            stdin = getContents >>= (return . lines) >>= args
 
-usage    = putStrLn "Usage: happy [-vh] [[NUM ..]|-]"
-ver      = putStrLn "happy 0.0.1"
+usage    = putStrLn "Usage: happy [[[-h|--help]|[-v|--version]]|[[NUM ..]|-]]"
+ver      = putStrLn "happy 0.0.2"
 exitSucc = exitWith ExitSuccess
 exitFail = exitWith $ ExitFailure 1
