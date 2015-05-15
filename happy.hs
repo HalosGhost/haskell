@@ -17,19 +17,35 @@ happiness :: Int -> String
 happiness n | happy n   = "Happy"
             | otherwise = "Unhappy"
 
+disp :: Int -> String
+disp n = happiness n ++ " " ++ show (happySeq n)
+
 main :: IO ()
 main = getArgs >>= parse >>= putStrLn
 
 parse :: [String] -> IO String
-parse a | elem "-h" a || elem "--help"    a = usage >> exitSucc
-        | elem "-v" a || elem "--version" a = ver   >> exitSucc
-        | a == []     || elem "-"         a = stdin
-        | otherwise                         = args a
+parse a | elem "-h" a    || elem "--help"    a = usage >> exitSucc
+        | elem "-v" a    || elem "--version" a = ver   >> exitSucc
+        | head a == "-s" || head a == "--seq"  = seq' $ tail a
+        | elem "-" a                           = truthStdin
+        | otherwise                            = truthArgs a
         where
-           args  = return . List.intercalate " " . map (happiness . read)
-           stdin = getContents >>= (return . lines) >>= args
+           seq' l | head l == "-" = listStdin
+                  | otherwise     = listArgs l
+           listArgs   = return . List.intercalate " " . map (disp . read)
+           listStdin  = getContents >>= (return . lines) >>= listArgs
+           truthArgs  = return . List.intercalate " " . map (happiness . read)
+           truthStdin = getContents >>= (return . lines) >>= truthArgs
 
-usage    = putStrLn "Usage: happy [[[-h|--help]|[-v|--version]]|[[NUM ..]|-]]"
-ver      = putStrLn "happy 0.0.2"
+ver   = putStrLn "happy 1.0.0"
+usage = putStrLn $ List.intercalate "\n" help
+      where help = [ "Usage: happy [options] [NUM ..]\n"
+                   , "Options:"
+                   , "  -h, --help      Show this help and exit"
+                   , "  -v, --version   Show the version and exit"
+                   , "  -s, --seq       Include the sequence for each input\n"
+                   , "Pass '-' instead of [NUM ..] for stdin"
+                   ]
+
 exitSucc = exitWith ExitSuccess
 exitFail = exitWith $ ExitFailure 1
