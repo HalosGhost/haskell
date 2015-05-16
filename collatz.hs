@@ -18,19 +18,34 @@ collatz n = last (collatzSeq n) == 1
 collatzConject :: Int -> String
 collatzConject n = show $ collatz n
 
+disp :: Int -> String
+disp n = collatzConject n ++ " " ++ show (collatzSeq n)
+
 main :: IO ()
 main = getArgs >>= parse >>= putStrLn
 
 parse :: [String] -> IO String
-parse a | elem "-h" a || elem "--help"    a = usage >> exitSucc
-        | elem "-v" a || elem "--version" a = ver   >> exitSucc
-        | a == []     || elem "-"         a = stdin
-        | otherwise                         = args a
+parse a | elem "-h" a    || elem "--help"    a = usage >> exitSucc
+        | elem "-v" a    || elem "--version" a = ver   >> exitSucc
+        | head a == "-s" || head a == "--seq"  = seq' $ tail a
+        | elem "-" a                           = truthStdin
+        | otherwise                            = truthArgs a
         where
-           args  = return . List.intercalate " " . map (collatzConject . read)
-           stdin = getContents >>= (return . lines) >>= args
+           seq' l | head l == "-" = listStdin
+                  | otherwise     = listArgs l
+           listArgs   = return . List.intercalate " " . map (disp . read)
+           listStdin  = getContents >>= (return . lines) >>= listArgs
+           truthArgs  = return . List.intercalate " " . map (collatzConject . read)
+           truthStdin = getContents >>= (return . lines) >>= truthArgs
 
-usage    = putStrLn "Usage: collatz [[[-h|--help]|[-v|--version]]|[[NUM ..]|-]]"
-ver      = putStrLn "collatz 0.0.2"
+ver   = putStrLn "happy 1.0.0"
+usage = putStrLn $ List.intercalate "\n" help
+      where help = [ "Usage: collatz [options] [[NUM ..]|-]\n"
+                   , "Options:"
+                   , "  -h, --help      Show this help and exit"
+                   , "  -v, --version   Show the version and exit"
+                   , "  -s, --seq       Include the sequence for each input"
+                   ]
+
 exitSucc = exitWith ExitSuccess
 exitFail = exitWith $ ExitFailure 1
