@@ -39,12 +39,11 @@ parse a | elem "-h" a    || elem "--help"    a = usage >> exitSucc
 
 ver   = putStrLn "happy 1.0.0"
 usage = putStrLn $ List.intercalate "\n" help
-      where help = [ "Usage: happy [options] [NUM ..]\n"
+      where help = [ "Usage: happy [options] [[NUM ..]|-]\n"
                    , "Options:"
                    , "  -h, --help      Show this help and exit"
                    , "  -v, --version   Show the version and exit"
-                   , "  -s, --seq       Include the sequence for each input\n"
-                   , "Pass '-' instead of [NUM ..] for stdin"
+                   , "  -s, --seq       Include the sequence for each input"
                    ]
 
 exitSucc = exitWith ExitSuccess
