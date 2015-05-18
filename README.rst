@@ -21,6 +21,6 @@ To Do
 - [X] Add ``-s`` options to happy and collatz to print the sequence for a given input
 - [ ] Purify/cleanup happy/collatz
 - [ ] Fibonacci Generator (Fast fibs algorithm)
-- [ ] ``hr`` implementation
+- [X] ``hr`` implementation
 - [ ] Basic ``echo`` or ``cat``
 - [ ] Something with ncurses
