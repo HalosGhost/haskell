@@ -1,5 +1,5 @@
 import qualified Data.Char as Char
-import qualified Data.List as List
+import Data.List
 import System.Environment
 import System.Exit
 
@@ -32,13 +32,13 @@ parse a | elem "-h" a    || elem "--help"    a = usage >> exitSucc
         where
            seq' l | head l == "-" = listStdin
                   | otherwise     = listArgs l
-           listArgs   = return . List.intercalate " " . map (disp . read)
+           listArgs   = return . intercalate " " . map (disp . read)
            listStdin  = getContents >>= (return . lines) >>= listArgs
-           truthArgs  = return . List.intercalate " " . map (happiness . read)
+           truthArgs  = return . intercalate " " . map (happiness . read)
            truthStdin = getContents >>= (return . lines) >>= truthArgs
 
 ver   = putStrLn "happy 1.0.0"
-usage = putStrLn $ List.intercalate "\n" help
+usage = putStrLn $ intercalate "\n" help
       where help = [ "Usage: happy [options] [[NUM ..]|-]\n"
                    , "Options:"
                    , "  -h, --help      Show this help and exit"
