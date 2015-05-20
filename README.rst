@@ -23,4 +23,7 @@ To Do
 - [ ] Fibonacci Generator (Fast fibs algorithm)
 - [X] ``hr`` implementation
 - [ ] Basic ``echo`` or ``cat``
-- [ ] Something with ncurses
+- [ ] Ncurses IRC client
+- [ ] IRC Bot
+- [ ] Bindings for `IUP <http://webserver2.tecgraf.puc-rio.br/iup/>`_ (?)
+- [ ] Something with IUP bindings (?)
