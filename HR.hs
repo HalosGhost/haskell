@@ -11,8 +11,8 @@ hr _  0 = [""]
 hr [] n = [[x | x <- take n $ repeat '#']]
 hr xs n = map (take n . concat . repeat) xs
 
-main :: IO ()
-main = getArgs >>= putHR
-
 putHR :: [String] -> IO ()
 putHR l = Size.size >>= mapM_ putStrLn . hr l . fromMaybe 80 . liftM Size.width
+
+main :: IO ()
+main = getArgs >>= putHR
