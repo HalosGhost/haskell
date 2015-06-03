@@ -20,6 +20,10 @@ To Do
 - [X] Collatz Conjecture tester
 - [X] Add ``-s`` options to happy and collatz to print the sequence for a given input
 - [ ] Purify/cleanup happy/collatz
+- [ ] Basic status output program to pipe into dwm's panel
+
+  - [ ] Looks like I might need to create a module for querying ACPI values and a module for querying Pulseaudio
+
 - [ ] Fibonacci Generator (Fast fibs algorithm)
 - [X] ``hr`` implementation
 - [ ] Basic ``echo`` or ``cat``
