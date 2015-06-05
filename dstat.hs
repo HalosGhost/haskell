@@ -2,7 +2,7 @@ import System.Process
 import Data.Time
 import Data.Time.Format
 
-bat_loc = "/sys/bus/acpi/drivers/battery/PNP0C0A:00/power_supply/"
+bat_loc = "/sys/class/power_supply/"
 en_loc  = "/sys/class/net/"
 wl_loc  = "/proc/net/wireless"
 
