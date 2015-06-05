@@ -1,4 +1,6 @@
 import System.Process
+import Data.Time
+import Data.Time.Format
 
 bat_loc = "/sys/bus/acpi/drivers/battery/PNP0C0A:00/power_supply/"
 en_loc  = "/sys/class/net/"
@@ -14,6 +16,7 @@ infix 1 ?
 (?) True  x _ = x
 (?) False _ y = y
 
+-- eventually replace with an ACPI module
 bat_status :: String -> IO Char
 bat_status b = do stat <- readFile $ bat_loc ++ b ++ "/status"
                   return $ head stat == 'C' ? 'ϟ' $ 'D'
@@ -23,6 +26,7 @@ bat_comp b = do l <- bat_level b
                 s <- bat_status b
                 return $ show l ++ [s]
 
+-- eventually replace with a pulseaudio module
 vol :: IO Int
 vol = do v <- readProcess "ponymix" ["get-volume"] []
          return $ read $ init v
@@ -44,8 +48,12 @@ wl_bars s | s < 0     = "No Signal" | s <= 10 = "▂"
           | s <= 60   = "▂▃▄▅▆▇"    | s <= 70 = "▂▃▄▅▆▇█"
           | otherwise = "No Signal"
 
+cur_time :: String -> IO String
+cur_time f = getCurrentTime >>= return . formatTime defaultTimeLocale f
+
 main :: IO ()
 --main = vol >>= putStrLn . show
 --main = bat_comp "BAT0" >>= putStrLn
 --main = en_stat "enp0s25" >>= putStrLn
-main = wl_str "wlp3s0" >>= putStrLn . wl_bars
+--main = wl_str "wlp3s0" >>= putStrLn . wl_bars
+main = cur_time "%H.%M | %A, %d %B %Y" >>= putStrLn
