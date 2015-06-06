@@ -1,6 +1,5 @@
 import System.Process
 import Data.Time
-import Data.Time.Format
 
 bat_loc = "/sys/class/power_supply/"
 en_loc  = "/sys/class/net/"
@@ -49,11 +48,11 @@ wl_bars s | s < 0     = "No Signal" | s <= 10 = "▂"
           | otherwise = "No Signal"
 
 cur_time :: String -> IO String
-cur_time f = getCurrentTime >>= return . formatTime defaultTimeLocale f
+cur_time f = getZonedTime >>= return . formatTime defaultTimeLocale f
 
 main :: IO ()
 --main = vol >>= putStrLn . show
 --main = bat_comp "BAT0" >>= putStrLn
 --main = en_stat "enp0s25" >>= putStrLn
 --main = wl_str "wlp3s0" >>= putStrLn . wl_bars
-main = cur_time "%H.%M | %A, %d %B %Y" >>= putStrLn
+main = cur_time "%H.%M (%Z) | %A, %d %B %Y" >>= putStrLn
