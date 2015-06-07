@@ -3,6 +3,7 @@ module Main where
 import System.Process (readProcess)
 import Data.Time (getZonedTime, formatTime, defaultTimeLocale)
 import Control.Concurrent (threadDelay)
+import System.Command (runCommand, waitForProcess, exitCode)
 import Graphics.X11.Xlib.Event (sync)
 import Graphics.X11.Xlib.Display (defaultRootWindow, openDisplay, closeDisplay)
 import Graphics.X11.Xlib.Types (Display)
@@ -29,6 +30,16 @@ vol :: IO Int
 vol = do v <- readProcess "ponymix" ["get-volume"] []
          return $ read $ init v
 
+muted :: IO Char
+muted = do p <- runCommand "ponymix is-muted"
+           e <- waitForProcess p
+           return $ if e /= (exitCode 0) then '%' else 'X'
+
+vol_comp :: IO String
+vol_comp = do v <- vol
+              m <- muted
+              return $ show v ++ [m]
+
 en_stat :: String -> IO String
 en_stat e = do stat <- readFile $ en_loc ++ e ++ "/operstate"
                return $ if head stat == 'u' then "U" else "D"
@@ -51,8 +62,7 @@ cur_time f = getZonedTime >>= return . formatTime defaultTimeLocale f
 
 stats ::IO String
 stats = do b <- bat_comp "BAT0"
-           vl <- vol
-           let v = show vl
+           v <- vol_comp
            e <- en_stat "enp0s25"
            wl <- wl_str "wlp3s0"
            let w = wl_bars wl
