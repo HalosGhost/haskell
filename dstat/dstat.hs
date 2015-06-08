@@ -24,7 +24,7 @@ bat_status b = do stat <- readFile $ bat_loc ++ b ++ "/status"
 bat_comp :: String -> IO String
 bat_comp b = do l <- bat_level b
                 s <- bat_status b
-                return $ show l ++ [s]
+                return $ "B: " ++ show l ++ [s]
 
 vol :: IO Int
 vol = do v <- readProcess "ponymix" ["get-volume"] []
@@ -38,11 +38,11 @@ muted = do p <- runCommand "ponymix is-muted"
 vol_comp :: IO String
 vol_comp = do v <- vol
               m <- muted
-              return $ show v ++ [m]
+              return $ "A: " ++ show v ++ [m]
 
 en_stat :: String -> IO String
 en_stat e = do stat <- readFile $ en_loc ++ e ++ "/operstate"
-               return $ if head stat == 'u' then "U" else "D"
+               return $ "E: " ++ (if head stat == 'u' then "U" else "D")
 
 wl_str :: String -> IO Int
 wl_str s = do stat <- readFile $ wl_loc
@@ -60,14 +60,17 @@ wl_bars s | s < 0     = "No Signal" | s <= 10 = "▂"
 cur_time :: String -> IO String
 cur_time f = getZonedTime >>= return . formatTime defaultTimeLocale f
 
+(<|>) :: String -> String -> String
+f <|> s = f ++ " | " ++ s
+
 stats ::IO String
 stats = do b <- bat_comp "BAT0"
            v <- vol_comp
            e <- en_stat "enp0s25"
            wl <- wl_str "wlp3s0"
-           let w = wl_bars wl
+           let w = "W: " ++ wl_bars wl
            t <- cur_time "%H.%M (%Z) | %A, %d %B %Y"
-           return $ "E: "++e++" | W: "++w++" | A: "++v++" | B: "++b++" | "++t
+           return $ e <|> w <|> v <|> b <|> t
 
 status :: Display -> IO ()
 status d = do let w = defaultRootWindow d
