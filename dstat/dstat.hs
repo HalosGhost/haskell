@@ -66,24 +66,27 @@ cur_time f = getZonedTime >>= return . formatTime defaultTimeLocale f
 (<|>) :: String -> String -> String
 f <|> s = f ++ " | " ++ s
 
-stats :: IO String
-stats = do b <- bat_comp "BAT0"
-           v <- vol_comp
-           e <- en_stat "enp0s25"
-           wl <- wl_str "wlp3s0"
-           let w = "W: " ++ wl_bars wl
-           t <- cur_time "%H.%M (%Z) | %A, %d %B %Y"
-           return $ e <|> w <|> v <|> b <|> t
+type StatOpts = (String, String, String, String)
 
-status :: Display -> IO ()
-status d = do let w = defaultRootWindow d
-              s <- stats
-              storeName d w s
-              sync d False
-              threadDelay 6000000
-              status d
+stats :: StatOpts  -> IO String
+stats (bt, en, wl, cl) = do b <- bat_comp bt
+                            v <- vol_comp
+                            e <- en_stat en
+                            w <- wl_str wl
+                            let wc = "W: " ++ wl_bars w
+                            t <- cur_time cl
+                            return $ e <|> wc <|> v <|> b <|> t
 
-ver   = putStrLn "dstat 1.0.0"
+status :: Maybe Display -> StatOpts -> IO ()
+status Nothing  sts = stats sts >>= putStrLn
+status (Just d) sts = do let w = defaultRootWindow d
+                         s <- stats sts
+                         storeName d w s
+                         sync d False
+                         threadDelay 6000000
+                         status (Just d) sts
+
+ver   = putStrLn "dstat 0.1.0"
 usage = putStrLn $ intercalate "\n" help
       where help = [ "Usage: dstat [options]\n"
                    , "Options:"
@@ -101,7 +104,12 @@ main = getArgs >>= parse
 parse :: [String] -> IO ()
 parse a | elem "-h" a    || elem "--help"   a = usage >> exitSucc >>= putStrLn
         | elem "-v" a    || elem "--ver"    a = ver   >> exitSucc >>= putStrLn
-        | elem "-s" a    || elem "--stdout" a = stats >>= putStrLn
+        | elem "-s" a    || elem "--stdout" a = status Nothing defs
         | otherwise                           = do d <- openDisplay ""
-                                                   status d
+                                                   status (Just d) defs
                                                    closeDisplay d
+        where defs = ( "BAT0"
+                     , "enp0s25"
+                     , "wlp3s0"
+                     , "%H.%M (%Z) | %A, %d %B %Y"
+                     )
