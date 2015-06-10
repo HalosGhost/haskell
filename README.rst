@@ -23,7 +23,7 @@ To Do
 - [X] Basic status output program to pipe into dwm's panel
 
   - [ ] Eventually replace external process calls with modules (which I may have to write)
-  - [ ] Move configuration to command-line options
+  - [-] Move configuration to command-line options
 
 - [ ] Fibonacci Generator (Fast fibs algorithm)
 - [X] ``hr`` implementation
