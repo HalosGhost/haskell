@@ -102,14 +102,14 @@ main :: IO ()
 main = getArgs >>= parse
 
 parse :: [String] -> IO ()
-parse a | elem "-h" a    || elem "--help"   a = usage >> exitSucc >>= putStrLn
-        | elem "-v" a    || elem "--ver"    a = ver   >> exitSucc >>= putStrLn
-        | elem "-s" a    || elem "--stdout" a = status Nothing defs
-        | otherwise                           = do d <- openDisplay ""
-                                                   status (Just d) defs
-                                                   closeDisplay d
+parse a | elem "-h" a || elem "--help"   a = usage >> exitSucc >>= putStrLn
+        | elem "-v" a || elem "--ver"    a = ver   >> exitSucc >>= putStrLn
+        | elem "-s" a || elem "--stdout" a = status Nothing defs
+        | otherwise                        = do d <- openDisplay ""
+                                                status (Just d) defs
+                                                closeDisplay d
         where defs = ( "BAT0"
-                     , "enp0s25"
-                     , "wlp3s0"
+                     , "enp0s25" -- eventually eth0
+                     , "wlp3s0"  -- eventually wlan0
                      , "%H.%M (%Z) | %A, %d %B %Y"
                      )
