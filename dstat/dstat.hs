@@ -1,5 +1,6 @@
 module Main where
 
+import Data.List (intercalate)
 import System.Process (readProcess)
 import Data.Time (getZonedTime, formatTime, defaultTimeLocale)
 import Control.Concurrent (threadDelay)
@@ -8,6 +9,8 @@ import Graphics.X11.Xlib.Event (sync)
 import Graphics.X11.Xlib.Display (defaultRootWindow, openDisplay, closeDisplay)
 import Graphics.X11.Xlib.Types (Display)
 import Graphics.X11.Xlib.Window (storeName)
+import System.Exit (exitWith, ExitCode(ExitSuccess, ExitFailure))
+import System.Environment (getArgs)
 
 bat_loc = "/sys/class/power_supply/"
 en_loc  = "/sys/class/net/"
@@ -80,7 +83,25 @@ status d = do let w = defaultRootWindow d
               threadDelay 6000000
               status d
 
+ver   = putStrLn "dstat 1.0.0"
+usage = putStrLn $ intercalate "\n" help
+      where help = [ "Usage: dstat [options]\n"
+                   , "Options:"
+                   , "  -h, --help      Show this help and exit"
+                   , "  -v, --ver       Show the version and exit"
+                   , "  -s, --stdout    Print output to stdout instead"
+                   ]
+
+exitSucc = exitWith ExitSuccess
+exitFail = exitWith $ ExitFailure 1
+
 main :: IO ()
-main = do d <- openDisplay ""
-          status d
-          closeDisplay d
+main = getArgs >>= parse
+
+parse :: [String] -> IO ()
+parse a | elem "-h" a    || elem "--help"   a = usage >> exitSucc >>= putStrLn
+        | elem "-v" a    || elem "--ver"    a = ver   >> exitSucc >>= putStrLn
+        | elem "-s" a    || elem "--stdout" a = stats >>= putStrLn
+        | otherwise                           = do d <- openDisplay ""
+                                                   status d
+                                                   closeDisplay d
