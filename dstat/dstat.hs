@@ -66,7 +66,7 @@ cur_time f = getZonedTime >>= return . formatTime defaultTimeLocale f
 (<|>) :: String -> String -> String
 f <|> s = f ++ " | " ++ s
 
-stats ::IO String
+stats :: IO String
 stats = do b <- bat_comp "BAT0"
            v <- vol_comp
            e <- en_stat "enp0s25"
