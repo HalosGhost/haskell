@@ -1,6 +1,7 @@
 module Main where
 
-import Data.List (intercalate)
+import Data.List (intercalate, elemIndex)
+import Data.Maybe (fromJust)
 import System.Process (readProcess)
 import Data.Time (getZonedTime, formatTime, defaultTimeLocale)
 import Control.Concurrent (threadDelay)
@@ -86,13 +87,17 @@ status (Just d) sts = do let w = defaultRootWindow d
                          threadDelay 6000000
                          status (Just d) sts
 
-ver   = putStrLn "dstat 0.1.0"
+ver   = putStrLn "dstat 0.8.0"
 usage = putStrLn $ intercalate "\n" help
       where help = [ "Usage: dstat [options]\n"
                    , "Options:"
                    , "  -h, --help      Show this help and exit"
                    , "  -v, --ver       Show the version and exit"
                    , "  -s, --stdout    Print output to stdout instead"
+                   , "  -e, --en ETH    Use ETH for wired iface (def: en0)"
+                   , "  -w, --wl WLN    Use WLN for wireless iface (def: wl0)"
+                   , "  -b, --bat BAT   Use BAT for battery (def: BAT0)"
+                   , "  -c, --clk FMT   Use FMT to format the clock"
                    ]
 
 exitSucc = exitWith ExitSuccess
@@ -104,12 +109,25 @@ main = getArgs >>= parse
 parse :: [String] -> IO ()
 parse a | elem "-h" a || elem "--help"   a = usage >> exitSucc >>= putStrLn
         | elem "-v" a || elem "--ver"    a = ver   >> exitSucc >>= putStrLn
-        | elem "-s" a || elem "--stdout" a = status Nothing defs
+        | elem "-s" a || elem "--stdout" a = status Nothing devs
         | otherwise                        = do d <- openDisplay ""
-                                                status (Just d) defs
+                                                status (Just d) devs
                                                 closeDisplay d
-        where defs = ( "BAT0"
-                     , "enp0s25" -- eventually eth0
-                     , "wlp3s0"  -- eventually wlan0
-                     , "%H.%M (%Z) | %A, %d %B %Y"
+        where nextArg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
+              bat  | elem "-b"    a = nextArg "-b"    a
+                   | elem "--bat" a = nextArg "--bat" a
+                   | otherwise      = "BAT0"
+              wrd  | elem "-e"    a = nextArg "-e"    a
+                   | elem "--en"  a = nextArg "--en"  a
+                   | otherwise      = "en0"
+              wrl  | elem "-w"    a = nextArg "-w"    a
+                   | elem "--wl"  a = nextArg "--wl"  a
+                   | otherwise      = "wl0"
+              clk  | elem "-c"    a = nextArg "-c"    a
+                   | elem "--clk" a = nextArg "--clk" a
+                   | otherwise      = "%H.%M (%Z) | %A, %d %B %Y"
+              devs = ( bat
+                     , wrd
+                     , wrl
+                     , clk
                      )
