@@ -69,7 +69,7 @@ f <|> s = f ++ " | " ++ s
 
 type StatOpts = (String, String, String, String)
 
-stats :: StatOpts  -> IO String
+stats :: StatOpts -> IO String
 stats (bt, en, wl, cl) = do b <- bat_comp bt
                             v <- vol_comp
                             e <- en_stat en
