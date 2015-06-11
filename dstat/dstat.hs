@@ -79,7 +79,10 @@ stats (bt, en, wl, cl) = do b <- bat_comp bt
                             return $ e <|> wc <|> v <|> b <|> t
 
 status :: Maybe Display -> StatOpts -> IO ()
-status Nothing  sts = stats sts >>= putStrLn
+status Nothing  sts = do s <- stats sts
+                         putStrLn s
+                         threadDelay 6000000
+                         status Nothing sts
 status (Just d) sts = do let w = defaultRootWindow d
                          s <- stats sts
                          storeName d w s
