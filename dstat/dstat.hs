@@ -103,7 +103,10 @@ usage = putStrLn $ intercalate "\n" help
                    , "  -c, --clk FMT   Use FMT to format the clock"
                    ]
 
-exitSucc = exitWith ExitSuccess
+exitSucc :: IO a
+exitSucc = exitWith   ExitSuccess
+
+exitFail :: IO a
 exitFail = exitWith $ ExitFailure 1
 
 main :: IO ()
@@ -116,19 +119,14 @@ parse a | elem "-h" a || elem "--help"   a = usage >> exitSucc >>= putStrLn
         | otherwise                        = do d <- openDisplay ""
                                                 status (Just d) devs
                                                 closeDisplay d
-        where nextArg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
-              bat  | elem "-b"    a = nextArg "-b"    a
-                   | elem "--bat" a = nextArg "--bat" a
-                   | otherwise      = "BAT0"
-              wrd  | elem "-e"    a = nextArg "-e"    a
-                   | elem "--en"  a = nextArg "--en"  a
-                   | otherwise      = "en0"
-              wrl  | elem "-w"    a = nextArg "-w"    a
-                   | elem "--wl"  a = nextArg "--wl"  a
-                   | otherwise      = "wl0"
-              clk  | elem "-c"    a = nextArg "-c"    a
-                   | elem "--clk" a = nextArg "--clk" a
-                   | otherwise      = "%H.%M (%Z) | %A, %d %B %Y"
+        where arg s l = (drop (1 + (fromJust $ elemIndex s)) l) !! 0
+              nextArg (s,l,d) ls | elem s ls = arg s ls
+                                 | elem l ls = arg l ls
+                                 | otherwise = d
+              bat  = nextArg ("-b", "--bat", "BAT0") a
+              wrd  = nextArg ("-e", "--en",  "en0")  a
+              wrl  = nextArg ("-w", "--wl",  "wl0")  a
+              clk  = nextArg ("-c", "--clk", "%H.%M (%Z) | %A, %d %B %Y") a
               devs = ( bat
                      , wrd
                      , wrl
