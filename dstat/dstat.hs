@@ -103,10 +103,8 @@ usage = putStrLn $ intercalate "\n" help
                    , "  -c, --clk FMT   Use FMT to format the clock"
                    ]
 
-exitSucc :: IO a
+exitSucc, exitFail :: IO a
 exitSucc = exitWith   ExitSuccess
-
-exitFail :: IO a
 exitFail = exitWith $ ExitFailure 1
 
 main :: IO ()
@@ -119,7 +117,7 @@ parse a | elem "-h" a || elem "--help"   a = usage >> exitSucc >>= putStrLn
         | otherwise                        = do d <- openDisplay ""
                                                 status (Just d) devs
                                                 closeDisplay d
-        where arg s l = (drop (1 + (fromJust $ elemIndex s)) l) !! 0
+        where arg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
               nextArg (s,l,d) ls | elem s ls = arg s ls
                                  | elem l ls = arg l ls
                                  | otherwise = d
