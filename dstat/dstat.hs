@@ -108,25 +108,46 @@ exitSucc = exitWith   ExitSuccess
 exitFail = exitWith $ ExitFailure 1
 
 main :: IO ()
-main = getArgs >>= parse
+main = do ga <- getArgs
+          let dc = parse ga
+          dispatch dc
 
-parse :: [String] -> IO ()
-parse a | elem "-h" a || elem "--help"   a = usage >> exitSucc >>= putStrLn
-        | elem "-v" a || elem "--ver"    a = ver   >> exitSucc >>= putStrLn
-        | elem "-s" a || elem "--stdout" a = status Nothing devs
-        | otherwise                        = do d <- openDisplay ""
-                                                status (Just d) devs
-                                                closeDisplay d
-        where arg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
-              nextArg (s,l,d) ls | elem s ls = arg s ls
-                                 | elem l ls = arg l ls
-                                 | otherwise = d
-              bat  = nextArg ("-b", "--bat", "BAT0") a
-              wrd  = nextArg ("-e", "--en",  "en0")  a
-              wrl  = nextArg ("-w", "--wl",  "wl0")  a
-              clk  = nextArg ("-c", "--clk", "%H.%M (%Z) | %A, %d %B %Y") a
-              devs = ( bat
-                     , wrd
-                     , wrl
-                     , clk
-                     )
+data DstatConfig = Config { help     :: Bool
+                          , version  :: Bool
+                          , stdout   :: Bool
+                          , batDev   :: String
+                          , wiredDev :: String
+                          , wifiDev  :: String
+                          , timeFmt  :: String
+                          } deriving (Eq, Show)
+
+parse :: [String] -> DstatConfig
+parse a = Config { help     = (elem "-h" a || elem "--help"    a)
+                 , version  = (elem "-v" a || elem "--version" a)
+                 , stdout   = (elem "-s" a || elem "--stdout"  a)
+                 , batDev   = batteryDevice
+                 , wiredDev = wiredDevice
+                 , wifiDev  = wirelessDevice
+                 , timeFmt  = timeFormat
+                 } where
+                 nextArg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
+                 optArg (s,l,d) ls | elem s ls = nextArg s ls
+                                   | elem l ls = nextArg l ls
+                                   | otherwise = d
+                 batteryDevice  = optArg ("-b", "--bat", "BAT0") a
+                 wiredDevice    = optArg ("-e", "--en",  "en0")  a
+                 wirelessDevice = optArg ("-w", "--wl", "wl0")   a
+                 timeFormat     = optArg ("-c", "--clk", "%H.%M (%Z) | %A, %d %B %Y") a
+
+dispatch :: DstatConfig -> IO ()
+dispatch c | help c    = usage >> exitSucc >>= putStrLn
+           | version c = ver >> exitSucc >>= putStrLn
+           | stdout c  = status Nothing cfg
+           | otherwise = do d <- openDisplay ""
+                            status (Just d) cfg
+                            closeDisplay d
+           where cfg = ( batDev   c
+                       , wiredDev c
+                       , wifiDev  c
+                       , timeFmt  c
+                       )
