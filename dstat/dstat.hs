@@ -5,6 +5,7 @@ import Data.Maybe (fromJust)
 import System.Process (readProcess)
 import Data.Time (getZonedTime, formatTime, defaultTimeLocale)
 import Control.Concurrent (threadDelay)
+import Control.Monad (forever)
 import System.Command (runCommand, waitForProcess, exitCode)
 import Graphics.X11.Xlib.Event (sync)
 import Graphics.X11.Xlib.Display (defaultRootWindow, openDisplay, closeDisplay)
@@ -78,16 +79,14 @@ stats (bt, en, wl, cl) = do b <- batComp bt
                             return $ e <|> wc <|> v <|> b <|> t
 
 status :: Maybe Display -> StatOpts -> IO ()
-status Nothing  sts = do s <- stats sts
-                         putStrLn s
-                         threadDelay 6000000
-                         status Nothing sts
-status (Just d) sts = do let w = defaultRootWindow d
-                         s <- stats sts
-                         storeName d w s
-                         sync d False
-                         threadDelay 6000000
-                         status (Just d) sts
+status disp sts = let updateDwm d s = do let w = defaultRootWindow d
+                                         storeName d w s
+                                         sync d False
+                      in forever $ do s <- stats sts
+                                      case disp of
+                                           Nothing  -> putStrLn s
+                                           (Just d) -> updateDwm d s
+                                      threadDelay 6000000
 
 ver   = putStrLn "dstat 0.8.0"
 usage = putStrLn $ intercalate "\n" help
