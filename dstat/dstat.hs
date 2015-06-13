@@ -55,11 +55,10 @@ wl_str s = do stat <- readFile $ wl_loc
               return $ if cnctd then (read $ take 2 $ status_line!!2) else -1
 
 wl_bars :: Int -> String
-wl_bars s | s < 0     = "No Signal" | s <= 10 = "▂"
-          | s <= 20   = "▂▃"        | s <= 30 = "▂▃▄"
-          | s <= 40   = "▂▃▄▅"      | s <= 50 = "▂▃▄▅▆"
-          | s <= 60   = "▂▃▄▅▆▇"    | s <= 70 = "▂▃▄▅▆▇█"
-          | otherwise = "No Signal"
+wl_bars s | s > 60 = "▂▃▄▅▆▇█" | s > 50    = "▂▃▄▅▆▇"
+          | s > 40 = "▂▃▄▅▆"   | s > 30    = "▂▃▄▅"
+          | s > 20 = "▂▃▄"     | s > 10    = "▂▃"
+          | s >= 0 = "▂"       | otherwise = "No Signal"
 
 cur_time :: String -> IO String
 cur_time f = getZonedTime >>= return . formatTime defaultTimeLocale f
@@ -136,7 +135,7 @@ parse a = Config { help     = (elem "-h" a || elem "--help"    a)
                                    | otherwise = d
                  batteryDevice  = optArg ("-b", "--bat", "BAT0") a
                  wiredDevice    = optArg ("-e", "--en",  "en0")  a
-                 wirelessDevice = optArg ("-w", "--wl", "wl0")   a
+                 wirelessDevice = optArg ("-w", "--wl",  "wl0")  a
                  timeFormat     = optArg ("-c", "--clk", "%H.%M (%Z) | %A, %d %B %Y") a
 
 dispatch :: DstatConfig -> IO ()
