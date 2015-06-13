@@ -120,14 +120,15 @@ data DstatConfig = Config { help     :: Bool
                           } deriving (Eq, Show)
 
 parse :: [String] -> DstatConfig
-parse a = Config { help     = (elem "-h" a || elem "--help"    a)
-                 , version  = (elem "-v" a || elem "--version" a)
-                 , stdout   = (elem "-s" a || elem "--stdout"  a)
+parse a = Config { help     = isPresent ("-h", "--help")    a
+                 , version  = isPresent ("-v", "--version") a
+                 , stdout   = isPresent ("-s", "--stdout")  a
                  , batDev   = batteryDevice
                  , wiredDev = wiredDevice
                  , wifiDev  = wirelessDevice
                  , timeFmt  = timeFormat
                  } where
+                 isPresent (f,s) l = (elem f l || elem s l)
                  nextArg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
                  optArg (s,l,d) ls | elem s ls = nextArg s ls
                                    | elem l ls = nextArg l ls
@@ -139,7 +140,7 @@ parse a = Config { help     = (elem "-h" a || elem "--help"    a)
 
 dispatch :: DstatConfig -> IO ()
 dispatch c | help c    = usage >> exitSucc >>= putStrLn
-           | version c = ver >> exitSucc >>= putStrLn
+           | version c = ver   >> exitSucc >>= putStrLn
            | stdout c  = status Nothing cfg
            | otherwise = do d <- openDisplay ""
                             status (Just d) cfg
