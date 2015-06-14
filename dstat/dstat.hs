@@ -136,7 +136,10 @@ parse a = Config { help     = isPresent ("-h", "--help")    a
                  batteryDevice  = optArg ("-b", "--bat", "BAT0") a
                  wiredDevice    = optArg ("-e", "--en",  "en0")  a
                  wirelessDevice = optArg ("-w", "--wl",  "wl0")  a
-                 timeFormat     = optArg ("-c", "--clk", "%H.%M (%Z) | %A, %d %B %Y") a
+                 timeFormat     = optArg ( "-c"
+                                         , "--clk"
+                                         , "%H.%M (%Z) | %A, %d %B %Y"
+                                         ) a
 
 dispatch :: DstatConfig -> IO ()
 dispatch c | help c    = usage >> exitSucc >>= putStrLn
