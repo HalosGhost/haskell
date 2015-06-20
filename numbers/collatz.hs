@@ -1,3 +1,5 @@
+module Math.Collatz where
+
 import qualified Data.Char as Char
 import Data.List
 import System.Environment
@@ -25,7 +27,8 @@ main :: IO ()
 main = getArgs >>= parse >>= putStrLn
 
 parse :: [String] -> IO String
-parse a | elem "-h" a    || elem "--help"    a = usage >> exitSucc
+parse a | null a                               = usage >> exitFail
+        | elem "-h" a    || elem "--help"    a = usage >> exitSucc
         | elem "-v" a    || elem "--version" a = ver   >> exitSucc
         | head a == "-s" || head a == "--seq"  = seq' $ tail a
         | elem "-" a                           = truthStdin
