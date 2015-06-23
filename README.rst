@@ -25,6 +25,7 @@ To Do
   - [ ] Eventually replace external process calls with modules (which I may have to write)
   - [-] Move configuration to command-line options
 
+- [ ] Fix ``lsip``'s ``-4``, ``-6`` and ``-a`` options
 - [ ] Fibonacci Generator (Fast fibs algorithm)
 - [X] ``hr`` implementation
 - [-] silo and cabalize each project so they are each simply buildable with ``cabal build``
