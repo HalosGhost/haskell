@@ -48,6 +48,4 @@ usage   = putStrLn $ intercalate "\n" help
                      ]
 
 main :: IO ()
-main = do ga <- getArgs
-          let conf = parseArgs ga
-          dispatch conf
+main = getArgs >>= dispatch . parseArgs
