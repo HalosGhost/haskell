@@ -93,7 +93,7 @@ usage = putStrLn $ intercalate "\n" help
       where help = [ "Usage: dstat [options]\n"
                    , "Options:"
                    , "  -h, --help      Show this help and exit"
-                   , "  -v, --ver       Show the version and exit"
+                   , "  -v, --version   Show the version and exit"
                    , "  -s, --stdout    Print output to stdout instead"
                    , "  -e, --en ETH    Use ETH for wired iface (def: en0)"
                    , "  -w, --wl WLN    Use WLN for wireless iface (def: wl0)"
@@ -106,9 +106,7 @@ exitSucc = exitWith   ExitSuccess
 exitFail = exitWith $ ExitFailure 1
 
 main :: IO ()
-main = do ga <- getArgs
-          let dc = parse ga
-          dispatch dc
+main = getArgs >>= dispatch . parseArgs
 
 data DstatConfig = Config { help     :: Bool
                           , version  :: Bool
@@ -119,27 +117,28 @@ data DstatConfig = Config { help     :: Bool
                           , timeFmt  :: String
                           } deriving (Eq, Show)
 
-parse :: [String] -> DstatConfig
-parse a = Config { help     = isPresent ("-h", "--help")    a
-                 , version  = isPresent ("-v", "--version") a
-                 , stdout   = isPresent ("-s", "--stdout")  a
-                 , batDev   = batteryDevice
-                 , wiredDev = wiredDevice
-                 , wifiDev  = wirelessDevice
-                 , timeFmt  = timeFormat
-                 } where
-                 isPresent (f,s) l = (elem f l || elem s l)
-                 nextArg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
-                 optArg (s,l,d) ls | elem s ls = nextArg s ls
-                                   | elem l ls = nextArg l ls
-                                   | otherwise = d
-                 batteryDevice  = optArg ("-b", "--bat", "BAT0") a
-                 wiredDevice    = optArg ("-e", "--en",  "en0")  a
-                 wirelessDevice = optArg ("-w", "--wl",  "wl0")  a
-                 timeFormat     = optArg ( "-c"
-                                         , "--clk"
-                                         , "%H.%M (%Z) | %A, %d %B %Y"
-                                         ) a
+parseArgs :: [String] -> DstatConfig
+parseArgs a = Config
+            { help     = isPresent ("-h", "--help")    a
+            , version  = isPresent ("-v", "--version") a
+            , stdout   = isPresent ("-s", "--stdout")  a
+            , batDev   = batteryDevice
+            , wiredDev = wiredDevice
+            , wifiDev  = wirelessDevice
+            , timeFmt  = timeFormat
+            } where
+            isPresent (f,s) l = (elem f l || elem s l)
+            nextArg s l = (drop (1 + (fromJust $ elemIndex s l)) l) !! 0
+            optArg (s,l,d) ls | elem s ls = nextArg s ls
+                              | elem l ls = nextArg l ls
+                              | otherwise = d
+            batteryDevice  = optArg ("-b", "--bat", "BAT0") a
+            wiredDevice    = optArg ("-e", "--en",  "en0")  a
+            wirelessDevice = optArg ("-w", "--wl",  "wl0")  a
+            timeFormat     = optArg ( "-c"
+                                    , "--clk"
+                                    , "%H.%M (%Z) | %A, %d %B %Y"
+                                    ) a
 
 dispatch :: DstatConfig -> IO ()
 dispatch c | help c    = usage >> exitSucc >>= putStrLn
