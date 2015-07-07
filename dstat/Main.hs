@@ -73,12 +73,6 @@ curTime :: String -> IO String
 curTime "" = return ""
 curTime f  = getZonedTime >>= return . formatTime defaultTimeLocale f
 
-(<|>) :: String -> String -> String
-"" <|> "" = ""
-"" <|> s  = s
-f  <|> "" = f
-f  <|> s  = f ++ " | " ++ s
-
 type StatOpts = (String, String, String, String, String)
 
 stats :: StatOpts -> IO String
@@ -87,7 +81,8 @@ stats (bt, vl, en, wl, cl) = do b <- batComp bt
                                 e <- enStatus en
                                 w <- wlComp wl
                                 t <- curTime cl
-                                return $ e <|> w <|> v <|> b <|> t
+                                return $ " | " *|* [e, w, v, b, t]
+                           where (*|*) s l = intercalate s $ filter (/= "") l
 
 status :: Maybe Display -> StatOpts -> IO ()
 status disp sts = let updateDwm d s = do let w = defaultRootWindow d
