@@ -73,26 +73,25 @@ curTime :: String -> IO String
 curTime "" = return ""
 curTime f  = getZonedTime >>= return . formatTime defaultTimeLocale f
 
-type StatOpts = (String, String, String, String, String)
+stats :: DstatConfig -> IO String
+stats cfg = let s *|* l = intercalate s $ filter (/= "") l
+             in do b <- batComp  $ batDev   cfg
+                   v <- volComp  $ volDev   cfg
+                   e <- enStatus $ wiredDev cfg
+                   w <- wlComp   $ wifiDev  cfg
+                   t <- curTime  $ timeFmt  cfg
+                   return $ " | " *|* [e, w, v, b, t]
 
-stats :: StatOpts -> IO String
-stats (bt, vl, en, wl, cl) = let s *|* l = intercalate s $ filter (/= "") l
-                          in do b <- batComp bt
-                                v <- volComp vl
-                                e <- enStatus en
-                                w <- wlComp wl
-                                t <- curTime cl
-                                return $ " | " *|* [e, w, v, b, t]
-
-status :: Maybe Display -> StatOpts -> IO ()
-status disp sts = let updateDwm d s = do let w = defaultRootWindow d
+status :: Maybe Display -> DstatConfig -> IO ()
+status disp sts = let interval      = 1000000 * (read $ ival sts) :: Int
+                      updateDwm d s = do let w = defaultRootWindow d
                                          storeName d w s
                                          sync d False
-                      in forever $ do s <- stats sts
-                                      case disp of
-                                           Nothing  -> putStrLn s
-                                           (Just d) -> updateDwm d s
-                                      threadDelay 6000000
+                         in forever $ do s <- stats sts
+                                         case disp of
+                                              Nothing  -> putStrLn s
+                                              (Just d) -> updateDwm d s
+                                         threadDelay interval
 
 ver   = putStrLn "dstat 0.8.0"
 usage = putStrLn $ intercalate "\n" help
@@ -107,6 +106,7 @@ usage = putStrLn $ intercalate "\n" help
                    , "  -c, --clk FMT   Use FMT to format the clock (def: “%H.%M (%Z) | %A, %d %B %Y”)"
                    , "  -C, --noclk     Do not display the clock module"
                    , "  -V, --novol     Do not display the volume module\n"
+                   , "  -i, --ival TM   Pause for TM seconds between refreshes (def: 6)"
                    , "  -h, --help      Show this help and exit"
                    , "  -v, --version   Show the version and exit"
                    , "  -s, --stdout    Print output to stdout instead"
@@ -122,6 +122,7 @@ main = getArgs >>= dispatch . parseArgs
 data DstatConfig = Config { help     :: Bool
                           , version  :: Bool
                           , stdout   :: Bool
+                          , ival     :: String
                           , batDev   :: String
                           , volDev   :: String
                           , wiredDev :: String
@@ -134,6 +135,7 @@ parseArgs a = Config
             { help     = isPresent ("-h", "--help"   )
             , version  = isPresent ("-v", "--version")
             , stdout   = isPresent ("-s", "--stdout" )
+            , ival     = timeInterval
             , batDev   = noDispIf  ("-B", "--nobat"  ) batteryDevice
             , volDev   = noDispIf  ("-V", "--novol"  ) "placeholder"
             , wiredDev = noDispIf  ("-E", "--noen"   ) wiredDevice
@@ -146,9 +148,10 @@ parseArgs a = Config
             optArg (s,l,d) ls | elem s ls = nextArg s ls
                               | elem l ls = nextArg l ls
                               | otherwise = d
-            batteryDevice  = optArg ("-b", "--bat", "BAT0") a
-            wiredDevice    = optArg ("-e", "--en",  "en0")  a
-            wirelessDevice = optArg ("-w", "--wl",  "wl0")  a
+            batteryDevice  = optArg ("-b", "--bat",  "BAT0") a
+            wiredDevice    = optArg ("-e", "--en",   "en0" ) a
+            wirelessDevice = optArg ("-w", "--wl",   "wl0" ) a
+            timeInterval   = optArg ("-i", "--ival", "6"   ) a
             timeFormat     = optArg ( "-c"
                                     , "--clk"
                                     , "%H.%M (%Z) | %A, %d %B %Y"
@@ -157,13 +160,7 @@ parseArgs a = Config
 dispatch :: DstatConfig -> IO ()
 dispatch c | help c    = usage >> exitSucc >>= putStrLn
            | version c = ver   >> exitSucc >>= putStrLn
-           | stdout c  = status Nothing cfg
+           | stdout c  = status Nothing c
            | otherwise = do d <- openDisplay ""
-                            status (Just d) cfg
+                            status (Just d) c
                             closeDisplay d
-           where cfg = ( batDev   c
-                       , volDev   c
-                       , wiredDev c
-                       , wifiDev  c
-                       , timeFmt  c
-                       )
