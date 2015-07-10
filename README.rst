@@ -23,7 +23,7 @@ To Do
 - [X] Basic status output program to pipe into dwm's panel
 
   - [ ] Eventually replace external process calls with modules (which I may have to write)
-  - [-] Move configuration to command-line options
+  - [X] Move configuration to command-line options
 
 - [ ] Fix ``lsip``'s ``-4``, ``-6`` and ``-a`` options
 - [ ] Fibonacci Generator (Fast fibs algorithm)
