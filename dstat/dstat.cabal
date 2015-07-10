@@ -2,7 +2,7 @@
 --  see http://haskell.org/cabal/users-guide/
 
 name:                dstat
-version:             0.1.0.0
+version:             1.0.0.1
 synopsis:            A simple status bar updater for dwm
 homepage:            https://github.com/HalosGhost/hs/tree/master/dstat
 license-file:        ../LICENSE
