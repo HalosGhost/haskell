@@ -107,7 +107,7 @@ usage = putStrLn $ intercalate "\n" help
                    , "  -c, --clk FMT   Use FMT to format the clock (def: “%H.%M (%Z) | %A, %d %B %Y”)"
                    , "  -C, --noclk     Do not display the clock module"
                    , "  -V, --novol     Do not display the volume module\n"
-                   , "  -S, --sep STR   Use STR to separate modules (def: \" | \")"
+                   , "  -S, --sep STR   Use STR to separate modules (def: “ | ”)"
                    , "  -i, --ival TM   Pause for TM seconds between refreshes (def: 6)"
                    , "  -h, --help      Show this help and exit"
                    , "  -v, --version   Show the version and exit"
@@ -157,10 +157,8 @@ parseArgs a = Config
             wirelessDevice = optArg ("-w", "--wl",   "wl0" ) a
             timeInterval   = optArg ("-i", "--ival", "6"   ) a
             separator      = optArg ("-S", "--sep",  " | " ) a
-            timeFormat     = optArg ( "-c"
-                                    , "--clk"
-                                    , "%H.%M (%Z) | %A, %d %B %Y"
-                                    ) a
+            timeFormat     = optArg ("-c", "--clk",  tfmt  ) a
+                           where tfmt = "%H.%M (%Z) | %A, %d %B %Y"
 
 dispatch :: DstatConfig -> IO ()
 dispatch c | help c    = usage >> exitSucc >>= putStrLn
