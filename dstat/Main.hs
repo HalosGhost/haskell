@@ -80,7 +80,7 @@ stats cfg = let s *|* l = intercalate s $ filter (/= "") l
                    e <- enStatus $ wiredDev cfg
                    w <- wlComp   $ wifiDev  cfg
                    t <- curTime  $ timeFmt  cfg
-                   return $ " | " *|* [e, w, v, b, t]
+                   return $ (sep cfg) *|* [e, w, v, b, t]
 
 status :: Maybe Display -> DstatConfig -> IO ()
 status disp sts = let interval      = 1000000 * (read $ ival sts) :: Int
@@ -107,6 +107,7 @@ usage = putStrLn $ intercalate "\n" help
                    , "  -c, --clk FMT   Use FMT to format the clock (def: “%H.%M (%Z) | %A, %d %B %Y”)"
                    , "  -C, --noclk     Do not display the clock module"
                    , "  -V, --novol     Do not display the volume module\n"
+                   , "  -S, --sep STR   Use STR to separate modules (def: \" | \")"
                    , "  -i, --ival TM   Pause for TM seconds between refreshes (def: 6)"
                    , "  -h, --help      Show this help and exit"
                    , "  -v, --version   Show the version and exit"
@@ -124,6 +125,7 @@ data DstatConfig = Config { help     :: Bool
                           , version  :: Bool
                           , stdout   :: Bool
                           , ival     :: String
+                          , sep      :: String
                           , batDev   :: String
                           , volDev   :: String
                           , wiredDev :: String
@@ -137,6 +139,7 @@ parseArgs a = Config
             , version  = isPresent ("-v", "--version")
             , stdout   = isPresent ("-s", "--stdout" )
             , ival     = timeInterval
+            , sep      = separator
             , batDev   = noDispIf  ("-B", "--nobat"  ) batteryDevice
             , volDev   = noDispIf  ("-V", "--novol"  ) "placeholder"
             , wiredDev = noDispIf  ("-E", "--noen"   ) wiredDevice
@@ -153,6 +156,7 @@ parseArgs a = Config
             wiredDevice    = optArg ("-e", "--en",   "en0" ) a
             wirelessDevice = optArg ("-w", "--wl",   "wl0" ) a
             timeInterval   = optArg ("-i", "--ival", "6"   ) a
+            separator      = optArg ("-S", "--sep",  " | " ) a
             timeFormat     = optArg ( "-c"
                                     , "--clk"
                                     , "%H.%M (%Z) | %A, %d %B %Y"
