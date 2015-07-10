@@ -94,7 +94,7 @@ status disp sts = let interval      = 1000000 * (read $ ival sts) :: Int
                                          threadDelay interval
 
 ver, usage :: IO ()
-ver   = putStrLn "dstat 0.9.0"
+ver   = putStrLn "dstat 1.0.0"
 usage = putStrLn $ intercalate "\n" help
       where help = [ "Usage: dstat [options]\n"
                    , "Options:"
