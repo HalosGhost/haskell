@@ -15,9 +15,9 @@ fromRadixChar c = toInteger . fromJust $ elemIndex c vals
 
 fromRadixString :: Radix -> RadixEncodedInt -> Integer
 fromRadixString r s | r < 1 || r > 36  = error rangeErrMsg
-                    | invalidStr       = error $ s ++ glyphErrMsg ++ show r
+                    | invalidStr       = error $ glyphErrMsg ++ show r
                     | otherwise        = sum . valuesPerPlace r 0 $ reverse s
-                    where glyphErrMsg = " is not a valid number in radix "
+                    where glyphErrMsg = '“' : s ++ "” is invalid in radix "
                           rangeErrMsg = "Radix must be in the range [1..36]"
                           cs          = genericTake r chars
                           chars       = '1' : '0' : ['2' .. '9'] ++ ['a' .. 'z']
