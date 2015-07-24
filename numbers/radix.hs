@@ -9,6 +9,10 @@ import Data.Maybe
 type Radix           = Integer
 type RadixEncodedInt = String
 
+fromRadixChar :: Char -> Integer
+fromRadixChar c = toInteger . fromJust $ elemIndex c vals
+                where vals = ['0' .. '9'] ++ ['a' .. 'z']
+
 fromRadixString :: Radix -> RadixEncodedInt -> Integer
 fromRadixString r s | r < 1 || r > 36  = error rangeErrMsg
                     | invalidStr       = error $ s ++ glyphErrMsg ++ show r
@@ -23,12 +27,14 @@ valuesPerPlace :: Radix -> Integer -> RadixEncodedInt -> [Integer]
 valuesPerPlace r p []     = []
 valuesPerPlace r p (c:cs) | cs == []  = [n]
                           | otherwise =  n : valuesPerPlace r (p + 1) cs
-                          where n    = x * r ^ p
-                                x    = toInteger . fromJust . elemIndex c $ vals
-                                vals = ['0' .. '9'] ++ ['a' .. 'z']
+                          where n = (fromRadixChar c) * r ^ p
 
 (♯) :: Radix -> RadixEncodedInt -> Integer
 r♯s = fromRadixString r s
+
+toRadixChar :: Integer -> Char
+toRadixChar i = vals !! fromInteger i
+              where vals = ['0' .. '9'] ++ ['a' .. 'z']
 
 toRadixString :: Radix -> Integer -> RadixEncodedInt
 toRadixString r i | r < 1 || r > 36 = error "Radix must be in the range [1..36]"
