@@ -20,7 +20,7 @@ wlLoc  = "/proc/net/wireless"
 
 batLevel :: String -> IO Int
 batLevel b = do cap <- readFile $ batLoc ++ b ++ "/capacity"
-                return . read $ take 2 cap
+                return . read $ cap
 
 batStatus :: String -> IO Char
 batStatus b = do stat <- readFile $ batLoc ++ b ++ "/status"
@@ -83,7 +83,9 @@ stats cfg = let s *|* l = intercalate s $ filter (/= "") l
                    return $ (sep cfg) *|* [e, w, v, b, t]
 
 status :: Maybe Display -> DstatConfig -> IO ()
-status disp sts = let interval      = 1000000 * (read $ ival sts) :: Int
+status disp sts | outOnce sts = stats sts >>= putStrLn
+                | otherwise
+                = let interval      = 1000000 * (read $ ival sts) :: Int
                       updateDwm d s = do let w = defaultRootWindow d
                                          storeName d w s
                                          sync d False
@@ -112,6 +114,7 @@ usage = putStrLn $ intercalate "\n" help
                    , "  -h, --help      Show this help and exit"
                    , "  -v, --version   Show the version and exit"
                    , "  -s, --stdout    Print output to stdout instead"
+                   , "  -1, --once      Output only one line"
                    ]
 
 exitSucc, exitFail :: IO a
@@ -124,6 +127,7 @@ main = getArgs >>= dispatch . parseArgs
 data DstatConfig = Config { help     :: Bool
                           , version  :: Bool
                           , stdout   :: Bool
+                          , outOnce  :: Bool
                           , ival     :: String
                           , sep      :: String
                           , batDev   :: String
@@ -138,6 +142,7 @@ parseArgs a = Config
             { help     = isPresent ("-h", "--help"   )
             , version  = isPresent ("-v", "--version")
             , stdout   = isPresent ("-s", "--stdout" )
+            , outOnce  = isPresent ("-1", "--once"   )
             , ival     = timeInterval
             , sep      = separator
             , batDev   = noDispIf  ("-B", "--nobat"  ) batteryDevice
