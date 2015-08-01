@@ -38,7 +38,9 @@ toRadixChar i = vals !! fromInteger i
 
 toRadixString :: Radix -> Integer -> RadixEncodedInt
 toRadixString r i | r < 1 || r > 36 = error "Radix must be in the range [1..36]"
-                  | otherwise       = "1" -- Finish implementing
+                  | otherwise       = reverse [toRadixChar x| x <- as i r]
+                  where as 0 _ = []
+                        as n b = n `rem` b : as (n `div` b) b
 
 (♭) :: Radix -> Integer -> RadixEncodedInt
 r♭i = toRadixString r i
