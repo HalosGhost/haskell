@@ -11,7 +11,7 @@ type RadixEncodedInt = String
 
 fromRadixChar :: Char -> Integer
 fromRadixChar c = toInteger . fromJust $ elemIndex c vals
-                where vals = ['0' .. '9'] ++ ['a' .. 'z']
+                where vals = ['0'..'9'] ++ ['a'..'z']
 
 fromRadixString :: Radix -> RadixEncodedInt -> Integer
 fromRadixString r s | r < 1 || r > 36 = error rangeErrMsg
@@ -21,7 +21,7 @@ fromRadixString r s | r < 1 || r > 36 = error rangeErrMsg
                     where glyphErrMsg = '“' : s ++ "” is invalid in radix "
                           rangeErrMsg = "Radix must be in the range [1..36]"
                           cs          = genericTake r chars
-                          chars       = '1' : '0' : ['2' .. '9'] ++ ['a' .. 'z']
+                          chars       = '1' : '0' : ['2'..'9'] ++ ['a'..'z']
                           invalidStr  = elem False $ map (`elem` cs) s
 
 valuesPerPlace :: Radix -> Integer -> RadixEncodedInt -> [Integer]
@@ -40,7 +40,7 @@ toRadixChar i = vals !! fromInteger i
 toRadixString :: Radix -> Integer -> RadixEncodedInt
 toRadixString r i | r < 1 || r > 36 = error "Radix must be in the range [1..36]"
                   | r == 1          = genericReplicate i '1'
-                  | otherwise       = reverse [toRadixChar x| x <- as i r]
+                  | otherwise       = reverse [toRadixChar x | x <- as i r]
                   where as 0 _ = []
                         as n b = n `rem` b : as (n `div` b) b
 
