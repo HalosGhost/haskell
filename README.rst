@@ -30,7 +30,7 @@ To Do
 - [ ] Fibonacci Generator (Fast fibs algorithm)
 - [X] ``hr`` implementation
 - [-] silo and cabalize each project so they are each simply buildable with ``cabal build``
-- [ ] Quine
+- [X] Quine
 - [ ] Basic ``echo`` or ``cat``
 - [ ] vty-ui IRC client
 - [ ] IRC Bot
