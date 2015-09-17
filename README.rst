@@ -20,7 +20,7 @@ To Do
 - [X] Collatz Conjecture tester
 - [X] Add ``-s`` options to happy and collatz to print the sequence for a given input
 - [ ] Purify/cleanup happy/collatz
-- [-] Module to allow for representing integers in more obscure radicies
+- [X] Module to allow for representing integers in more obscure radicies
 - [X] Basic status output program to pipe into dwm's panel
 
   - [ ] Eventually replace external process calls with modules (which I may have to write)
