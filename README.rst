@@ -32,7 +32,7 @@ To Do
 - [-] silo and cabalize each project so they are each simply buildable with ``cabal build``
 - [X] Quine
 - [-] Basic ``echo`` or ``cat``
-- [ ] vty-ui IRC client
+- [ ] Brick-based IRC client
 - [ ] IRC Bot
 - [ ] Bindings for `IUP <http://webserver2.tecgraf.puc-rio.br/iup/>`_ (?)
 - [ ] Something with IUP bindings (?)
