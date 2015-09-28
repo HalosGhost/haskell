@@ -5,4 +5,6 @@ import System.Environment (getArgs)
 
 main :: IO ()
 main = do as <- getArgs
-          putStrLn . sparkLine $ (read <$> as :: [Double])
+          let output | null as   = "Usage: spark [natural numbers]"
+                     | otherwise = sparkLine $ (read <$> as :: [Double])
+          putStrLn output
