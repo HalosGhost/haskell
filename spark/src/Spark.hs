@@ -2,15 +2,14 @@
 
 module Spark (sparkLine) where
 
-import qualified Data.ListLike as LL
-import           Data.ListLike    (ListLike, StringLike)
+import qualified Data.Foldable as F
 
 sparkChar :: RealFrac f => f -> Char
 sparkChar n = "▂▃▄▅▆▇█" !! (round $ n * 6)
 
-normalize :: (ListLike l a, RealFrac a) => l -> l
-normalize is = (/n) `LL.map` is
-        where n = LL.maximum is
+normalize :: (Traversable t, Foldable t, Ord a, RealFrac a) => t a -> t a
+normalize is = (/n) <$> is
+        where n = F.maximum is
 
-sparkLine :: (ListLike l a, RealFrac a, ListLike s Char, StringLike s) => l -> s
-sparkLine is = LL.map sparkChar $ normalize is
+sparkLine :: (Traversable t, Foldable t, Ord a, RealFrac a) => t a -> t Char
+sparkLine is = sparkChar <$> (normalize is)
