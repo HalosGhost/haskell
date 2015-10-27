@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 module Spark (sparkLine) where
 
 import qualified Data.Foldable as F

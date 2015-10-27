@@ -11,7 +11,6 @@ cabal-version:       >=1.10
 library
   exposed-modules:   Spark
   ghc-options:       -Wall -O2
-  other-extensions:  FlexibleContexts
   build-depends:     base       >= 4.8   && < 4.9,
                      containers >= 0.5.6 && < 0.6
   hs-source-dirs:    src
