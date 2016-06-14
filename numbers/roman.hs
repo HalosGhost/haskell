@@ -38,8 +38,8 @@ toSubtractiveRoman :: Integral a => a -> String
 toSubtractiveRoman = additiveToSubtractive . toAdditiveRoman
 
 fromAdditiveRoman :: Integral a => String -> a
-fromAdditiveRoman "N"    = 0
-fromAdditiveRoman n      = fromAdditiveRoman' n
+fromAdditiveRoman "N" = 0
+fromAdditiveRoman n   = fromAdditiveRoman' n
 
 fromSubtractiveRoman :: Integral a => String -> a
 fromSubtractiveRoman = fromAdditiveRoman . subtractiveToAdditive
