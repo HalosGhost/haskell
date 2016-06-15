@@ -3,7 +3,7 @@ module Roman ( toRoman
              , RomanFormat(..)
              ) where
 
-import Data.List (group, stripPrefix)
+import Data.List (stripPrefix)
 import Data.Tuple (swap)
 
 -- | Data type for specifying the format of the Roman Numeral.
