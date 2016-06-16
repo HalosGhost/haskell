@@ -82,26 +82,23 @@ fromLenientRoman' (n:ns) = (fromLenientRoman' ns) + if c >= x then c else (- c)
 substitutionMap = zip ["IIII", "VIIII", "XXXX", "LXXXX", "CCCC", "DCCCC"]
                       ["IV",   "IX",    "XL",   "XC",    "CD",   "CM"]
 
-subStep :: (String, String) -> String -> String
-subStep (f, s) = replace f s
-
 additiveToSubtractive :: String -> String
-additiveToSubtractive s = foldr subStep s substitutionMap
+additiveToSubtractive s = foldr replace s substitutionMap
 
 subtractiveToAdditive :: String -> String
-subtractiveToAdditive s = foldr subStep s $ map swap substitutionMap
+subtractiveToAdditive s = foldr replace s $ map swap substitutionMap
 
 valToSubtract :: Integral a => a -> [a] -> a
 valToSubtract n []     = 0
 valToSubtract n (v:vs) = if n `div` v >= 1 then v else valToSubtract n vs
 
 -- http://haskell.1045720.n5.nabble.com/Newbie-Replacing-substring-td3113520.html
-replace :: Eq a => [a] -> [a] -> [a] -> [a]
-replace _ _ [] = []
-replace old new xs@(y:ys) =
+replace :: Eq a => ([a],[a]) -> [a] -> [a]
+replace _ [] = []
+replace (old,new) xs@(y:ys) =
   case stripPrefix old xs of
-    Nothing -> y : replace old new ys
-    Just ys' -> new ++ replace old new ys'
+    Nothing -> y : replace (old,new) ys
+    Just ys' -> new ++ replace (old,new) ys'
 
 glyphMap :: Integral a => [(a, String)]
 glyphMap = zip [1000, 500, 100,  50,  10,   5,   1]
