@@ -1,10 +1,65 @@
 module Roman ( toRoman
              , fromRoman
              , RomanFormat(..)
+             , main
              ) where
 
 import Data.List (stripPrefix)
 import Data.Tuple (swap)
+import System.Environment (getArgs)
+import System.Exit (exitWith, ExitCode(..))
+
+usage :: IO ()
+usage = putStr $ unlines
+  [ "roman -- convert Roman numerals to/from Arabic numerals"
+  , "Usage: roman <cmd><format> <obj [obj ...]>\n"
+  , "Commands:"
+  , "  -t*         Convert objects to Roman numerals"
+  , "  -f*         Convert objects to Arabic numerals"
+  , "  -h          Print this message\n"
+  , "Formats:"
+  , "  a           Additive"
+  , "  s           Subtractive"
+  , "  l           Lenient\n"
+  , "Note: capitalizing the format will add the glyph N for 0"
+  ]
+
+main :: IO ()
+main = getArgs >>= dispatch . parse
+
+dispatch :: Config -> IO ()
+dispatch c@(Config h cm fm st)
+  | help c      = usage >> exitWith ExitSuccess
+  | elem 't' cm = putStr $ ioMap ((toRoman fm) . read)
+  | elem 'f' cm = putStr $ ioMap (show . (fromRoman fm))
+  | otherwise   = usage >> exitWith (ExitFailure 1)
+  where ioMap f = unlines $ map f st
+
+data Config = Config { help :: Bool
+                     , cmd  :: String
+                     , fmt  :: RomanFormat
+                     , strs :: [String]
+                     }
+
+parse :: [String] -> Config
+parse a = Config
+  { help = null a || length a < 2 || elem "-h" a || elem "--help" a
+  , cmd = head a
+  , fmt = case head a of
+      "-tA" -> AdditiveN
+      "-fA" -> AdditiveN
+      "-ta" -> Additive
+      "-fa" -> Additive
+      "-tL" -> LenientN
+      "-fL" -> LenientN
+      "-tl" -> Lenient
+      "-fl" -> Lenient
+      "-tS" -> SubtractiveN
+      "-fS" -> SubtractiveN
+      "-ts" -> Subtractive
+      _     -> Subtractive
+  , strs = tail a
+  }
 
 -- | Data type for specifying the format of the Roman Numeral.
 data RomanFormat
