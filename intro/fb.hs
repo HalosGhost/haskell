@@ -1,7 +1,5 @@
 module Main where
 
-import Data.List (intercalate)
-
 (=%=) :: Integral a => a -> a -> Bool
 n =%= d = n `rem` d == 0
 
@@ -14,4 +12,4 @@ fb n | n =%= 15  = "FizzBuzz"
 fzbz :: (Integral a, Show a) => a -> [String]
 fzbz n = fb <$> [1..n]
 
-main = putStrLn . intercalate " " $ fzbz 100
+main = putStrLn . unwords $ fzbz 100
